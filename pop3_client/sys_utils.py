@@ -1,15 +1,18 @@
 import os
+from typing import Tuple
+
+SHARED_DIR = '../shared/'
 
 
 def read_init_file() -> str:
     """
-    Reads the file with requests and returns the last request
+    Reads the file with requests and returns a list of the requests
     """
 
-    init_fd = os.open('init_message.txt', os.O_RDONLY)
+    init_fd = os.open(f'{SHARED_DIR}init_message.txt', os.O_RDONLY)
 
     while init_fd == -1:
-        init_fd = os.open('init_message.txt', os.O_RDONLY)
+        init_fd = os.open(f'{SHARED_DIR}init_message.txt', os.O_RDONLY)
 
     read_bytes = os.read(init_fd, 256)
 
@@ -18,17 +21,17 @@ def read_init_file() -> str:
 
     os.close(init_fd)
 
-    return read_bytes.decode('utf-8').split('\n')[-1]
+    read_bytes.decode('utf-8').split('\n')
 
 
 def read_message_list_file(filepath: str) -> str:
     """
     Reads all contents of a message file and returns a list of the messages
     """
-    message_fd = os.open(filepath, os.O_RDONLY)
+    message_fd = os.open(f'{SHARED_DIR}{filepath}', os.O_RDONLY)
 
     while message_fd == -1:
-        message_fd = os.open(filepath, os.O_RDONLY)
+        message_fd = os.open(f'{SHARED_DIR}{filepath}', os.O_RDONLY)
 
     end_reached = False
     messagefile_contents = ''
@@ -47,17 +50,11 @@ def read_message_list_file(filepath: str) -> str:
     return messagefile_contents.split('\n')
 
 
-def read_message_file(filepath: str):
-    message_fd = os.open(filepath, os.O_RDONLY)
-
-    retry_count = 0
-
-    while message_fd == -1:
-        if retry_count == 11:
-            raise ValueError('Message file not found')
-
-        message_fd = os.open(filepath, os.O_RDONLY)
-        retry_count += 1
+def read_message_file(filepath: str) -> Tuple[bool, str]:
+    try:
+        message_fd = os.open(f'{SHARED_DIR}{filepath}', os.O_RDONLY)
+    except FileNotFoundError:
+        return False, 'Message file not found'
 
     end_reached = False
     messagefile_contents = ''
@@ -72,3 +69,12 @@ def read_message_file(filepath: str):
         messagefile_contents += read_bytes.decode('utf-8')
 
     return messagefile_contents
+
+
+def delete_msg_file(filepath: str) -> Tuple[bool, str]:
+    try:
+        os.unlink(f'{SHARED_DIR}{filepath}')
+
+        return True, 'Message deleted'
+    except FileNotFoundError:
+        return False, 'Message file not found'

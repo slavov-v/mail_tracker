@@ -1,5 +1,8 @@
 from message import Message
-from sys_utils import read_message_list_file, read_message_file
+from sys_utils import (
+    read_message_list_file,
+    read_message_file, delete_msg_file
+)
 
 
 def handle_user(msg: str):
@@ -31,10 +34,6 @@ def handle_list(msg: str, user):
     return Message(success=True, message=return_message)
 
 
-def handle_top(msg: str):
-    pass
-
-
 def handle_retr(msg: str):
     try:
         message_id = int(msg.split(' ')[-1])
@@ -47,7 +46,10 @@ def handle_retr(msg: str):
 
 
 def handle_dele(msg: str):
-    pass
+    message_id = msg.split(' ')[-1]
+    deleted, delete_response = delete_msg_file(f'{message_id}.txt')
+
+    return Message(success=deleted, message=delete_response)
 
 
 def get_action_prefix(msg):
