@@ -1,20 +1,29 @@
-import time
+import socket
 
-from sys_utils import read_init_file
 from services import dispatch
+
+HOST = 'localhost'
+PORT = 50007
 
 
 def main():
-    dispatched_actions = 0
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((HOST, PORT))
 
     while True:
-        try:
-            # Blocking the main process until an action is read
-            init_actions = read_init_file()
-            dispatch(init_actions[dispatched_actions])
-            dispatched_actions += 1
-        except IndexError:
-            time.sleep(1)
+        s.listen(1)
+
+        connection, address = s.accept()
+
+        with connection:
+            message = connection.recv(1024)
+            if not message:
+                return
+
+            print(message)
+
+            result = dispatch(message)
+            connection.sendall(str(result).encode('utf-8'))
 
 
 if __name__ == '__main__':

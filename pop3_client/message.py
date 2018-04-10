@@ -7,4 +7,4 @@ class Message:
         self.message = message
 
     def __str__(self):
-        return f'{"+OK" if self.success else "-ERR"}{self.message}\n'
+        return f'{"+OK" if self.success else "-ERR"} {self.message}\n'

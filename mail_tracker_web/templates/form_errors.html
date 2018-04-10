@@ -1,0 +1,5 @@
+<ul>
+  {% for field, error in form.errors.items %}
+    <li>{{ field }}: {{ error }}</li>
+  {% endfor %}
+</ul>

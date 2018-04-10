@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block "title" %}
+  Messages
+{% endblock %}
+
+{% block "body" %}
+<h1>
+  {{ response }}
+  <br/>
+  {% for line in content %}
+    {{ line.0 }} ---- {{ line.1 }}
+  {% endfor %}
+</h1>
+{% endblock %}

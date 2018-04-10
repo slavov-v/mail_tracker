@@ -25,11 +25,15 @@ def handle_pass(msg: str, user):
                    message='password accepted, connection established')
 
 
-def handle_list(msg: str, user):
-    message_list = read_message_list_file(f'{user}_list.txt')
-    messages = '\n'.join(message_list)
+def handle_list(msg: str):
+    _, user = msg.split(' ')
+    try:
+        message_list = read_message_list_file(f'{user}_list.txt')
+        messages = '\n'.join(message_list)
 
-    return_message = f'Mailbox scan list follows\n{messages}'
+        return_message = f'Mailbox scan list follows\n{messages}'
+    except FileNotFoundError:
+        return_message = 'No messages'
 
     return Message(success=True, message=return_message)
 
@@ -53,7 +57,7 @@ def handle_dele(msg: str):
 
 
 def get_action_prefix(msg):
-    return msg.split(' ')[0][1:]
+    return msg.split(' ')[0]
 
 
 def dispatch(msg: str):
@@ -65,6 +69,7 @@ def dispatch(msg: str):
         'DELE': handle_dele
     }
 
+    msg = msg.decode('utf-8')
     action_prefix = get_action_prefix(msg)
 
     return dispatcher[action_prefix](msg)

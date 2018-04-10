@@ -356,4 +356,4 @@ tags
 pyvenv.cfg
 pip-selfcheck.json
 
-.shared/
+db.sqlite3
