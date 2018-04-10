@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load extra_tags %}
 
 {% block "title" %}
   Messages
@@ -9,7 +10,8 @@
   {{ response }}
   <br/>
   {% for line in content %}
-    {{ line.0 }} ---- {{ line.1 }}
+    {{ line|get_item:"subject" }} --- {{ line|get_item:"id" }}
+    <a href="{% url "message_detail" line|get_item:"id" %}"><button>View</button></a> <br/>
   {% endfor %}
 </h1>
 {% endblock %}

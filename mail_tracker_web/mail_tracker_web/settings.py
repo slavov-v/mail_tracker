@@ -122,6 +122,8 @@ AUTH_USER_MODEL = 'web.BaseUser'
 POP3_HOST = 'localhost'
 POP3_PORT = 50007
 POP3_LIST_COMMAND = 'LIST {}'
+POP3_RETRIEVE_COMMAND = 'RETR {}'
+POP3_DELETE_COMMAND = 'DELE {} {}'
 
 
 # Static files (CSS, JavaScript, Images)

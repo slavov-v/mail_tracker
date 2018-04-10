@@ -1,28 +1,10 @@
 from message import Message
 from sys_utils import (
     read_message_list_file,
-    read_message_file, delete_msg_file
+    read_message_file,
+    delete_msg_file,
+    write_content_to_file
 )
-
-
-def handle_user(msg: str):
-    # TODO: Authenticate from Django here
-    authenticated = True
-
-    message = 'user accepted'
-
-    if not authenticated:
-        message = 'authentication failed'
-
-    return Message(success=authenticated, message=message), 'user'
-
-
-def handle_pass(msg: str, user):
-    if user is None:  # or authentication from Django fails
-        return Message(success=False, message='authentication failed')
-
-    return Message(success=True,
-                   message='password accepted, connection established')
 
 
 def handle_list(msg: str):
@@ -50,7 +32,20 @@ def handle_retr(msg: str):
 
 
 def handle_dele(msg: str):
-    message_id = msg.split(' ')[-1]
+    _, user, message_id = msg.split(' ')
+    list_file_contents = read_message_list_file(f'{user}_list.txt')
+
+    to_remove = None
+    for index, line in enumerate(list_file_contents):
+        read_id = line.split(' ')[-1]
+        if read_id and int(read_id) == message_id:
+            to_remove = index
+
+    if to_remove is not None:
+        list_file_contents.pop(index)
+
+        write_content_to_file(f'{user}_list.txt', '\n'.join(list_file_contents))
+
     deleted, delete_response = delete_msg_file(f'{message_id}.txt')
 
     return Message(success=deleted, message=delete_response)
@@ -62,8 +57,6 @@ def get_action_prefix(msg):
 
 def dispatch(msg: str):
     dispatcher = {
-        'USER': handle_user,
-        'PASS': handle_pass,
         'LIST': handle_list,
         'RETR': handle_retr,
         'DELE': handle_dele

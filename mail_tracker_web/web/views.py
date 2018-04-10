@@ -12,6 +12,7 @@ from .permissions import AnonymousRequiredPermission
 from .forms import RegisterForm, LoginForm
 from .models import BaseUser
 from .utils import parse_list_message
+from .mixins import ContextMixin
 
 
 class RegisterView(AnonymousRequiredPermission, FormView):
@@ -59,13 +60,10 @@ class LogoutView(LoginRequiredMixin, View):
         return redirect(reverse('index'))
 
 
-class IndexView(LoginRequiredMixin, TemplateView):
+class IndexView(LoginRequiredMixin, ContextMixin, TemplateView):
     login_url = reverse_lazy('auth:login')
 
     template_name = 'index.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -76,17 +74,38 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
             self.context = {
                 'response': parsed_data[0],
-                'content': parsed_data[1:]
+                'content': parsed_data[1]
             }
 
             s.detach()
 
         return super().get(request, *args, **kwargs)
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context.update(self.context)
 
-        print(context)
+class MessageDetailView(LoginRequiredMixin, ContextMixin, TemplateView):
+    login_url = reverse_lazy('auth:login')
+    template_name = 'message_detail.html'
 
-        return context
+    def get(self, request, *args, **kwargs):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((settings.POP3_HOST, settings.POP3_PORT))
+            s.sendall(settings.POP3_RETRIEVE_COMMAND.format(kwargs.get('message_id')).encode('utf-8'))
+            data = s.recv(4096)
+
+            self.context = {
+                'received_data': data.decode('utf-8'),
+                'message_id': kwargs.get('message_id')
+            }
+
+        return super().get(request, *args, **kwargs)
+
+
+class DeleteMessageView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((settings.POP3_HOST, settings.POP3_PORT))
+            s.sendall(settings.POP3_DELETE_COMMAND.format(
+                request.user.email.split('@')[0],
+                kwargs.get('message_id')).encode('utf-8'))
+
+        return redirect('index')

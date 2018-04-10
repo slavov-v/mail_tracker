@@ -78,3 +78,11 @@ def delete_msg_file(filepath: str) -> Tuple[bool, str]:
         return True, 'Message deleted'
     except FileNotFoundError:
         return False, 'Message file not found'
+
+
+def write_content_to_file(filepath: str, content: str):
+    fd = os.open(f'{SHARED_DIR}{filepath}', os.O_WRONLY)
+    written_bytes = os.write(fd, content)
+    os.close(fd)
+
+    return written_bytes

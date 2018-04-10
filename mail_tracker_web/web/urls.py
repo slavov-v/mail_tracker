@@ -1,5 +1,11 @@
 from django.urls import path, include
-from .views import RegisterView, LoginView, IndexView
+from .views import (
+    RegisterView,
+    LoginView,
+    IndexView,
+    MessageDetailView,
+    DeleteMessageView
+)
 
 
 auth_paths = [
@@ -10,5 +16,7 @@ auth_paths = [
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
+    path('messages/<int:message_id>/', MessageDetailView.as_view(), name='message_detail'),
+    path('delete/<int:message_id>/', DeleteMessageView.as_view(), name='delete_message'),
     path('auth/', include((auth_paths, 'web'), namespace='auth')),
 ]
