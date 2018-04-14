@@ -38,11 +38,12 @@ def handle_dele(msg: str):
     to_remove = None
     for index, line in enumerate(list_file_contents):
         read_id = line.split(' ')[-1]
-        if read_id and int(read_id) == message_id:
+        if read_id and read_id == message_id:
             to_remove = index
+            break
 
     if to_remove is not None:
-        list_file_contents.pop(index)
+        del list_file_contents[to_remove]
 
         write_content_to_file(f'{user}_list.txt', '\n'.join(list_file_contents))
 

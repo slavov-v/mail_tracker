@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block "title" %}
+  Send Email
+{% endblock %}
+
+{% block "body" %}
+  <form method="POST" action={% url "send_email" %}>
+    {% csrf_token %}
+    {% for field in form %}
+      {{ field.label }}<br/>
+      {{ field }}<br/>
+    {% endfor %}
+    <input type="submit" value="Send"/>
+  </form>
+{% endblock %}

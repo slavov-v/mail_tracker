@@ -27,4 +27,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print(f'POP3 processor running on {HOST}:{PORT}')
     main()

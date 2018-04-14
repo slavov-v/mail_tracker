@@ -124,7 +124,13 @@ POP3_PORT = 50007
 POP3_LIST_COMMAND = 'LIST {}'
 POP3_RETRIEVE_COMMAND = 'RETR {}'
 POP3_DELETE_COMMAND = 'DELE {} {}'
+POP3_SAVE_COMMAND = 'SAVE {}'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = '25'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

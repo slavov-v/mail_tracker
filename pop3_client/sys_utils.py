@@ -82,7 +82,10 @@ def delete_msg_file(filepath: str) -> Tuple[bool, str]:
 
 def write_content_to_file(filepath: str, content: str):
     fd = os.open(f'{SHARED_DIR}{filepath}', os.O_WRONLY)
-    written_bytes = os.write(fd, content)
+    os.ftruncate(fd, 0)
+    os.lseek(fd, 0, os.SEEK_SET)
+
+    written_bytes = os.write(fd, content.encode('utf-8'))
     os.close(fd)
 
     return written_bytes

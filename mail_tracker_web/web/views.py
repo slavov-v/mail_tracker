@@ -9,9 +9,9 @@ from django.db import IntegrityError
 from django.conf import settings
 
 from .permissions import AnonymousRequiredPermission
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, SendEmailForm
 from .models import BaseUser
-from .utils import parse_list_message
+from .utils import parse_list_message, send_email
 from .mixins import ContextMixin
 
 
@@ -109,3 +109,18 @@ class DeleteMessageView(LoginRequiredMixin, View):
                 kwargs.get('message_id')).encode('utf-8'))
 
         return redirect('index')
+
+
+class SendEmailView(LoginRequiredMixin, FormView):
+    form_class = SendEmailForm
+    success_url = reverse_lazy('index')
+    template_name = 'send_email.html'
+
+    def form_valid(self, form):
+        sender = self.request.user.email.split('@')[0] + 'localhost.com'
+        send_email(sender,
+                   form.cleaned_data.get('subject'),
+                   [form.cleaned_data.get('recipient')],
+                   form.cleaned_data.get('content'))
+
+        return super().form_valid(form)
