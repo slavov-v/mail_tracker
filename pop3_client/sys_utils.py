@@ -71,6 +71,25 @@ def read_message_file(filepath: str) -> Tuple[bool, str]:
     return messagefile_contents
 
 
+def read_id_file():
+    try:
+        # TODO: read till end of file
+        fd = os.open(f'{SHARED_DIR}message_ids.txt', os.O_RDONLY)
+        content = os.read(fd, 8192).decode('utf-8')
+        os.close(fd)
+
+        ids = content.split('\n')
+        ids.remove('')
+
+        return sorted([int(item) for item in ids])
+    except FileNotFoundError:
+        return [-1]
+
+
+def write_new_id(new_id):
+    write_content_to_file(f'{SHARED_DIR}message_ids.txt', f'{new_id}\n')
+
+
 def delete_msg_file(filepath: str) -> Tuple[bool, str]:
     try:
         os.unlink(f'{SHARED_DIR}{filepath}')
@@ -80,10 +99,16 @@ def delete_msg_file(filepath: str) -> Tuple[bool, str]:
         return False, 'Message file not found'
 
 
-def write_content_to_file(filepath: str, content: str):
+def clear_file_content(filepath: str):
     fd = os.open(f'{SHARED_DIR}{filepath}', os.O_WRONLY)
     os.ftruncate(fd, 0)
     os.lseek(fd, 0, os.SEEK_SET)
+
+    os.close(fd)
+
+
+def write_content_to_file(filepath: str, content: str):
+    fd = os.open(f'{SHARED_DIR}{filepath}', os.O_WRONLY | os.O_APPEND | os.O_CREAT)
 
     written_bytes = os.write(fd, content.encode('utf-8'))
     os.close(fd)

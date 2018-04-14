@@ -6,7 +6,8 @@
 {% endblock %}
 
 {% block "body" %}
-<h1>
+  <h1>
+    <a href="{% url "send_email" %}"><button>Send email</button></a><br/>
   {{ response }}
   <br/>
   {% for line in content %}

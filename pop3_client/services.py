@@ -3,7 +3,10 @@ from sys_utils import (
     read_message_list_file,
     read_message_file,
     delete_msg_file,
-    write_content_to_file
+    write_content_to_file,
+    clear_file_content,
+    read_id_file,
+    write_new_id
 )
 
 
@@ -38,6 +41,7 @@ def handle_dele(msg: str):
     to_remove = None
     for index, line in enumerate(list_file_contents):
         read_id = line.split(' ')[-1]
+
         if read_id and read_id == message_id:
             to_remove = index
             break
@@ -45,11 +49,31 @@ def handle_dele(msg: str):
     if to_remove is not None:
         del list_file_contents[to_remove]
 
+        clear_file_content(f'{user}_list.txt')
         write_content_to_file(f'{user}_list.txt', '\n'.join(list_file_contents))
 
     deleted, delete_response = delete_msg_file(f'{message_id}.txt')
 
     return Message(success=deleted, message=delete_response)
+
+
+def handle_save(msg: str):
+    command_and_subject, *data = msg.split('|')
+
+    subject = ' '.join(command_and_subject.split(' ')[:1])
+    sender, recipient, content = data
+    ids = read_id_file()
+
+    last_id = ids[-1]
+
+    write_new_id(last_id + 1)
+
+    list_file_path = f'{recipient.split("@")[0]}_list.txt'
+    list_file_message = f'{subject} {last_id + 1}\n'
+    write_content_to_file(list_file_path, list_file_message)
+
+    message_file_path = f'{last_id + 1}.txt'
+    write_content_to_file(message_file_path, content)
 
 
 def get_action_prefix(msg):
@@ -60,7 +84,8 @@ def dispatch(msg: str):
     dispatcher = {
         'LIST': handle_list,
         'RETR': handle_retr,
-        'DELE': handle_dele
+        'DELE': handle_dele,
+        'SAVE': handle_save
     }
 
     msg = msg.decode('utf-8')
