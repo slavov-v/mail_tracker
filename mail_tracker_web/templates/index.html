@@ -7,7 +7,9 @@
 
 {% block "body" %}
   <h1>
-    <a href="{% url "send_email" %}"><button>Send email</button></a><br/>
+    <a href="{% url "send_email" %}"><button>Send email</button></a>
+    <a href="{% url "auth:logout" %}"><button>Logout</button></a>
+    <br/>
   {{ response }}
   <br/>
   {% for line in content %}

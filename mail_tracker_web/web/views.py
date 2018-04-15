@@ -55,7 +55,7 @@ class LoginView(AnonymousRequiredPermission, FormView):
 
 class LogoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        logout(request.user)
+        logout(request)
 
         return redirect(reverse('index'))
 
@@ -112,7 +112,7 @@ class SendEmailView(LoginRequiredMixin, FormView):
     template_name = 'send_email.html'
 
     def form_valid(self, form):
-        sender = self.request.user.email.split('@')[0] + 'localhost.com'
+        sender = self.request.user.email.split('@')[0] + '@localhost.com'
         send_email(sender,
                    form.cleaned_data.get('subject'),
                    [form.cleaned_data.get('recipient')],
