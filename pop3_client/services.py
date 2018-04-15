@@ -60,7 +60,7 @@ def handle_dele(msg: str):
 def handle_save(msg: str):
     command_and_subject, *data = msg.split('|')
 
-    subject = ' '.join(command_and_subject.split(' ')[:1])
+    subject = ' '.join(command_and_subject.split(' ')[1:])
     sender, recipient, content = data
     ids = read_id_file()
 

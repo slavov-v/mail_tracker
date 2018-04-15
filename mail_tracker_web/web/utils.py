@@ -1,7 +1,25 @@
 import socket
+from contextlib import ContextDecorator
 
 from django.core.mail import send_mail
 from django.conf import settings
+
+
+class EstablishConnection(ContextDecorator):
+    def __enter__(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect((settings.POP3_HOST, settings.POP3_PORT))
+        return self
+
+    def __exit__(self, *exc):
+        self.socket.detach()
+        self.socket.close()
+
+    def send(self, data):
+        return self.socket.sendall(data)
+
+    def receive(self):
+        return self.socket.recv(8192)
 
 
 def parse_list_message(message):
@@ -14,10 +32,10 @@ def parse_list_message(message):
         if not len(item) > 0:
             continue
 
-        subject, item_id = item.split(' ')
+        *subject, item_id = item.split(' ')
 
         result_content.append({
-            'subject': subject,
+            'subject': ' '.join(subject),
             'id': item_id
         })
 
@@ -33,9 +51,8 @@ def send_email(sender, subject, recipients, content):
     if recipient_domain in LOCAL_DOMAINS:
         message = f'{subject}|{sender}|{",".join(recipients)}|{content}'
 
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((settings.POP3_HOST, settings.POP3_PORT))
-            s.sendall(settings.POP3_SAVE_COMMAND.format(message).encode('utf-8'))
+        with EstablishConnection() as connection:
+            connection.send(settings.POP3_SAVE_COMMAND.format(message).encode('utf-8'))
 
         return
 
