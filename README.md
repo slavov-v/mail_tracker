@@ -55,3 +55,7 @@ python manage.py runserver
 cd pop3_client
 python client.py
 ```
+* Open your browser and go to
+```
+localhost:8000
+```
