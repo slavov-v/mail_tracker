@@ -1,5 +1,5 @@
 # mail_tracker
-A project for System Programming @ TU-Sfoia
+A project for System Programming @ TU-Sofia
 
 ## Setup
 * Install Postfix for the SMTP server. Use the default configuration\
