@@ -10,7 +10,7 @@ from sys_utils import (
 )
 
 
-def handle_list(msg: str):
+def handle_list(msg: str) -> Message:
     _, user = msg.split(' ')
     try:
         message_list = read_message_list_file(f'{user}_list.txt')
@@ -23,7 +23,7 @@ def handle_list(msg: str):
     return Message(success=True, message=return_message)
 
 
-def handle_retr(msg: str):
+def handle_retr(msg: str) -> Message:
     try:
         message_id = int(msg.split(' ')[-1])
         contents = read_message_file(f'{message_id}.txt')
@@ -34,7 +34,7 @@ def handle_retr(msg: str):
         return Message(success=False, message='Message file not found')
 
 
-def handle_dele(msg: str):
+def handle_dele(msg: str) -> Message:
     _, user, message_id = msg.split(' ')
     list_file_contents = read_message_list_file(f'{user}_list.txt')
 
@@ -57,7 +57,7 @@ def handle_dele(msg: str):
     return Message(success=deleted, message=delete_response)
 
 
-def handle_save(msg: str):
+def handle_save(msg: str) -> None:
     command_and_subject, *data = msg.split('|')
 
     subject = ' '.join(command_and_subject.split(' ')[1:])
@@ -76,11 +76,11 @@ def handle_save(msg: str):
     write_content_to_file(message_file_path, content)
 
 
-def get_action_prefix(msg):
+def get_action_prefix(msg: str) -> str:
     return msg.split(' ')[0]
 
 
-def dispatch(msg: str):
+def dispatch(msg: str) -> Message:
     dispatcher = {
         'LIST': handle_list,
         'RETR': handle_retr,

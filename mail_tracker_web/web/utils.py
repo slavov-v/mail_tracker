@@ -1,5 +1,6 @@
 import socket
 from contextlib import ContextDecorator
+from typing import Tuple, List
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -15,14 +16,14 @@ class EstablishConnection(ContextDecorator):
         self.socket.detach()
         self.socket.close()
 
-    def send(self, data):
+    def send(self, data: str):
         return self.socket.sendall(data)
 
     def receive(self):
         return self.socket.recv(8192)
 
 
-def parse_list_message(message):
+def parse_list_message(message: str) -> Tuple[str, str]:
     response, *content = message.split('\n')
     response = ' '.join(response.split(' ')[1:])
 
@@ -44,7 +45,7 @@ def parse_list_message(message):
     return response, result_content
 
 
-def send_email(sender, subject, recipients, content):
+def send_email(sender: str, subject: str, recipients: List[str], content: str) -> None:
     LOCAL_DOMAINS = ['localhost', '127.0.0.1', '0.0.0.0']
     recipient_domain = recipients[0].split('@')[-1].split('.')[0]
 
