@@ -40,8 +40,6 @@ def parse_list_message(message: str) -> Tuple[str, str]:
             'id': item_id
         })
 
-    print(result_content)
-
     return response, result_content
 
 
