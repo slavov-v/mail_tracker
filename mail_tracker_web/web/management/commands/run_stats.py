@@ -54,8 +54,9 @@ def run_dele_stats(file_size, id):
 
 
 @time_run
-def run_save_stats(message_size, message):
+def run_save_stats(to_print, message_size):
     with EstablishConnection() as connection:
+        message = f'Test Subject|test@localhost.com|testsave@localhost.com|{message_size*"C"}'
         connection.send(settings.POP3_SAVE_COMMAND.format(message).encode('utf-8'))
 
 
@@ -75,5 +76,6 @@ class Command(BaseCommand):
         for index, i in enumerate(range(2001, 2011)):
             run_dele_stats(f'DELE Size: {file_sizes[index]}', id=i)
 
-        for index, message in enumerate():
-            pass
+        for file_size in file_sizes:
+
+            run_save_stats(f'SAVE Message Size: {file_size}', message_size=file_size)
